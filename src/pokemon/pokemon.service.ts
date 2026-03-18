@@ -44,7 +44,7 @@ export class PokemonService {
 
     // exception if not found
     if (!pokemon) {
-      throw new NotFoundException(`Pokemon witj¡h id, name or no "${term}" not found`);
+      throw new NotFoundException(`Pokemon with id, name or no "${term}" not found`);
     }
 
     return pokemon;
@@ -66,8 +66,10 @@ export class PokemonService {
   }
 
   async remove(id: string) {
-    const pokemon = await this.findOne(id);
-    await pokemon.deleteOne();
+    // const pokemon = await this.findOne(id);
+    // await pokemon.deleteOne();
+
+    return this.pokemonModel.findByIdAndDelete(id);
   }
 
   private handleExceptions(error: { code: number; keyValue: object }) {
