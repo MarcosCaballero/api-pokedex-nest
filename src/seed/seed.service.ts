@@ -5,6 +5,11 @@ import { Pokemon } from 'src/pokemon/entities/pokemon.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
+interface CreatePokemonDto {
+  name: string;
+  no: number;
+}
+
 @Injectable()
 export class SeedService {
   private readonly axios: AxiosInstance = axios;
@@ -16,9 +21,9 @@ export class SeedService {
 
   async executeSeed() {
     await this.pokemonModel.deleteMany({}); // Is like delete query without where condition
-    const { data } = await this.axios.get<PokeResponse>('https://pokeapi.co/api/v2/pokemon?limit=10');
+    const { data } = await this.axios.get<PokeResponse>('https://pokeapi.co/api/v2/pokemon?limit=650');
 
-    const insertPromisesArray = [];
+    const pokemonToInsert: CreatePokemonDto[] = [];
 
     for (const pokemon of data.results) {
       const segments: string[] = pokemon.url.split('/');
@@ -31,13 +36,10 @@ export class SeedService {
 
       const parsedNo: number = Number.parseInt(rawNo);
 
-      const createData = { name: pokemon.name.toLowerCase(), no: parsedNo };
-
-      insertPromisesArray.push(this.pokemonModel.create(createData));
+      pokemonToInsert.push({ name: pokemon.name.toLowerCase(), no: parsedNo });
     }
 
-    await Promise.all(insertPromisesArray);
-
+    await this.pokemonModel.insertMany(pokemonToInsert);
     return 'Seed executed';
   }
 }
