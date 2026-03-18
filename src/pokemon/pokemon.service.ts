@@ -66,10 +66,15 @@ export class PokemonService {
   }
 
   async remove(id: string) {
+    // En esta primera vez se hacen dos consultas a la base de datos y no es optimo
     // const pokemon = await this.findOne(id);
     // await pokemon.deleteOne();
 
-    return this.pokemonModel.findByIdAndDelete(id);
+    // En este caso solo se hace una vez, se busca y se elmina en la misma.
+    const { deletedCount } = await this.pokemonModel.deleteOne({ _id: id });
+    if (deletedCount === 0) {
+      throw new BadRequestException(`Pokemon with id "${id} not found"`);
+    }
   }
 
   private handleExceptions(error: { code: number; keyValue: object }) {
