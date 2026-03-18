@@ -15,7 +15,10 @@ export class SeedService {
   ) {}
 
   async executeSeed() {
+    await this.pokemonModel.deleteMany({}); // Is like delete query without where condition
     const { data } = await this.axios.get<PokeResponse>('https://pokeapi.co/api/v2/pokemon?limit=10');
+
+    const insertPromisesArray = [];
 
     for (const pokemon of data.results) {
       const segments: string[] = pokemon.url.split('/');
@@ -30,8 +33,10 @@ export class SeedService {
 
       const createData = { name: pokemon.name.toLowerCase(), no: parsedNo };
 
-      await this.pokemonModel.create(createData);
+      insertPromisesArray.push(this.pokemonModel.create(createData));
     }
+
+    await Promise.all(insertPromisesArray);
 
     return 'Seed executed';
   }
