@@ -29,6 +29,12 @@ docker-compose up -d
 http://localhost:3000/api/v2/seed
 ```
 
+6. Ejecutar aplicación:
+
+```
+npm run start
+```
+
 ## Stack usado
 
 - MongoDB
